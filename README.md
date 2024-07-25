@@ -53,9 +53,9 @@ To perform matching between two images, use this command:
 An example:
 
 ```bash
-./build/examples/example ../../weights/xfeat.pt \
-                         ../../ref.png \
-                         ../../tgt.png
+./build/examples/example $(pwd)/weights/xfeat.pt \
+                         $(pwd)/ref.png \
+                         $(pwd)/tgt.png
 ```
 
 ## Bibtex Citation
