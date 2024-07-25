@@ -187,6 +187,16 @@ namespace XFeat
             cv::drawMatches(img1, keypoints1, img2_with_corners, keypoints2, matches, img_matches, cv::Scalar::all(-1), cv::Scalar::all(-1), std::vector<char>(), cv::DrawMatchesFlags::NOT_DRAW_SINGLE_POINTS);
             cv::imshow("Matches", img_matches);
             cv::waitKey(0); // Wait for a key press
+            cv::drawMatches(img1, keypoints1, img2_with_corners, keypoints2, matches, img_matches, cv::Scalar::all(-1), cv::Scalar::all(-1), std::vector<char>(), cv::DrawMatchesFlags::NOT_DRAW_SINGLE_POINTS);
+            
+            // // Uncomment to save the matched image
+            // std::string output_path = "doc/image_matches.png";
+            // if (cv::imwrite(output_path, img_matches)) {
+            //     std::cout << "Saved image matches to " << output_path << std::endl;
+            // } else {
+            //     std::cerr << "Failed to save image matches to " << output_path << std::endl;
+            // }
+
         } else {
             std::cerr << "Keypoints or matches are empty, cannot draw matches" << std::endl;
         }

@@ -6,6 +6,8 @@ Original Repo: https://github.com/verlab/accelerated_features
 
 Paper: https://arxiv.org/abs/2404.19174
 
+![Image Matches](doc/image_matches.png)
+
 ## Prerequisite
 
 In this project, the following packages are used. Make sure the right versions of libraries are installed and linked.
