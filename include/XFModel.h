@@ -31,18 +31,18 @@ namespace XFeat
         torch::nn::InstanceNorm2d norm{nullptr};
         torch::nn::Sequential skip1{nullptr}; 
         torch::nn::Sequential block1{nullptr}, 
-                            block2{nullptr}, 
-                            block3{nullptr}, 
-                            block4{nullptr}, 
-                            block5{nullptr};
+                              block2{nullptr}, 
+                              block3{nullptr}, 
+                              block4{nullptr}, 
+                              block5{nullptr};
         torch::nn::Sequential block_fusion{nullptr}, 
-                            heatmap_head{nullptr}, 
-                            keypoint_head{nullptr};
+                              heatmap_head{nullptr}, 
+                              keypoint_head{nullptr};
         torch::nn::Sequential fine_matcher{nullptr};
 
         XFeatModel();
-        torch::Tensor unfold2d(torch::Tensor x, int ws=2);
-        std::tuple<torch::Tensor, torch::Tensor, torch::Tensor> forward(torch::Tensor x);
+        torch::Tensor unfold2d(torch::Tensor& x, int ws=2);
+        std::tuple<torch::Tensor, torch::Tensor, torch::Tensor> forward(torch::Tensor& x);
     };
 }
 

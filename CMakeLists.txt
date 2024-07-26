@@ -14,17 +14,13 @@ set(CMAKE_PREFIX_PATH "${PROJECT_SOURCE_DIR}/thirdparty/pytorch/torch")
 
 # find libraries
 find_package(Torch REQUIRED)
-find_package(Eigen3 REQUIRED)
 find_package(OpenCV REQUIRED)
-find_package(Pangolin REQUIRED)
 
 # libtorch config
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${TORCH_CXX_FLAGS}")
 
 include_directories(
-    ${EIGEN_INCLUDE_DIR}
     ${OpenCV_INCLUDE_DIR}
-    ${Pangolin_INCLUDE_DIRS}
 
     ${PROJECT_SOURCE_DIR}/include
     ${PROJECT_SOURCE_DIR}/thirdparty/
@@ -32,7 +28,6 @@ include_directories(
 
 set(THIRD_PARTY_LIBS
     ${OpenCV_LIBS}
-    ${Pangolin_LIBRARIES}
     ${TORCH_LIBRARIES}
 )
 

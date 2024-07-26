@@ -122,7 +122,7 @@ namespace XFeat
         register_module("fine_matcher", fine_matcher);
     }
 
-    torch::Tensor XFeatModel::unfold2d(torch::Tensor x, int ws)
+    torch::Tensor XFeatModel::unfold2d(torch::Tensor& x, int ws)
     {   
         /*
            Unfolds tensor in 2D with desired ws (window size) and concat the channels
@@ -133,7 +133,7 @@ namespace XFeat
         return x.permute({0, 1, 4, 2, 3}).reshape({B, -1, H/ws, W/ws});
     }
 
-    std::tuple<torch::Tensor, torch::Tensor, torch::Tensor> XFeatModel::forward(torch::Tensor x) 
+    std::tuple<torch::Tensor, torch::Tensor, torch::Tensor> XFeatModel::forward(torch::Tensor& x) 
     {   
         /* 
             input:
