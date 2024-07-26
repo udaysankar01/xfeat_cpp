@@ -4,14 +4,15 @@ namespace XFeat
 {
     
     // XFDetector Implementation
-    XFDetector::XFDetector(std::string _weights, int _top_k, float _detection_threshold, bool use_cuda) 
+    XFDetector::XFDetector(int _top_k, float _detection_threshold, bool use_cuda) 
         : top_k(_top_k), 
           detection_threshold(_detection_threshold)
     {   
         // load the model
+        weights = "weights/xfeat.pt";
         model = std::make_shared<XFeatModel>();
         torch::serialize::InputArchive archive;
-        archive.load_from(getWeightsPath(_weights));
+        archive.load_from(getWeightsPath(weights));
         model->load(archive);
         std::cout << "Model weights loaded successfully." << std::endl;
 
@@ -244,13 +245,13 @@ namespace XFeat
     }
 
     std::string XFDetector::getWeightsPath(std::string weights)
-    {   
+    {
         std::filesystem::path current_file = __FILE__;
         std::filesystem::path parent_dir = current_file.parent_path();
-        std::filesystem::path weights_path = parent_dir / ".." / weights;
+        std::filesystem::path full_path = parent_dir / ".." / weights;
+        full_path = std::filesystem::absolute(full_path);
 
-        return static_cast<std::string>(weights_path);    
+        return static_cast<std::string>(full_path);   
     }
-
 
 } // namespace XFeat 

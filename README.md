@@ -49,15 +49,13 @@ make -j4
 To perform matching between two images, use this command:
 
 ```bash
-./build/examples/example /path/to/weights /path/to/image1 /path/to/image2
+./build/examples/example /absolute/path/to/image1 /absolute/path/to/image2
 ```
 
 An example:
 
 ```bash
-./build/examples/example $(pwd)/weights/xfeat.pt \
-                         $(pwd)/ref.png \
-                         $(pwd)/tgt.png
+./build/examples/example $(pwd)/ref.png $(pwd)/tgt.png
 ```
 
 ## Bibtex Citation

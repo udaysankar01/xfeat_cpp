@@ -1,6 +1,7 @@
 #include "XFeat.h"
 
 // forward declarations
+std::string parsePath(std::string relativePath);
 void warp_corners_and_draw_matches(cv::Mat& mkpts_0, cv::Mat& mkpts_1, cv::Mat& img1, cv::Mat& img2);
 
 
@@ -12,15 +13,16 @@ int main(int argc, char** argv) {
         return -1;
     }
 
+
     // instantiate XFDetector
     int top_k = 4096;
     float detection_threshold = 0.05;
     bool use_cuda = true; 
-    XFeat::XFDetector detector(argv[1], top_k, detection_threshold, use_cuda);
+    XFeat::XFDetector detector(top_k, detection_threshold, use_cuda);
 
     // load the image and convert to tensor
-    cv::Mat image1 = cv::imread(argv[2]);
-    cv::Mat image2 = cv::imread(argv[3]);
+    cv::Mat image1 = cv::imread(argv[1]);
+    cv::Mat image2 = cv::imread(argv[2]);
     if (image1.empty() || image2.empty()) {
         std::cerr << "Could not open or find the images!" << std::endl;
         return -1;
@@ -95,4 +97,14 @@ void warp_corners_and_draw_matches(cv::Mat& ref_points, cv::Mat& dst_points, cv:
     } else {
         std::cerr << "Keypoints or matches are empty, cannot draw matches" << std::endl;
     }
+}
+
+std::string parsePath(std::string relativePath)
+{
+    std::filesystem::path current_file = __FILE__;
+    std::filesystem::path parent_dir = current_file.parent_path();
+    std::filesystem::path full_path = parent_dir / ".." / relativePath;
+    full_path = std::filesystem::absolute(full_path);
+
+    return static_cast<std::string>(full_path);   
 }
