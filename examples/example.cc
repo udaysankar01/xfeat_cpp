@@ -13,7 +13,6 @@ int main(int argc, char** argv) {
         return -1;
     }
 
-
     // instantiate XFDetector
     int top_k = 4096;
     float detection_threshold = 0.05;

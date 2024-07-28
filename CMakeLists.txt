@@ -16,8 +16,9 @@ set(CMAKE_PREFIX_PATH "${PROJECT_SOURCE_DIR}/thirdparty/pytorch/torch")
 find_package(Torch REQUIRED)
 find_package(OpenCV REQUIRED)
 
-# libtorch config
+# set compilation flags
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${TORCH_CXX_FLAGS}")
+set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -O3")
 
 include_directories(
     ${OpenCV_INCLUDE_DIR}

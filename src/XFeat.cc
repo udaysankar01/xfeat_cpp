@@ -94,7 +94,7 @@ namespace XFeat
         return result;
     }   
 
-    std::tuple<torch::Tensor, torch::Tensor> XFDetector::match(torch::Tensor& feats1, torch::Tensor& feats2)
+    std::tuple<torch::Tensor, torch::Tensor> XFDetector::match(torch::Tensor& feats1, torch::Tensor& feats2, float min_cossim)
     {   
         // compute cossine similarity between feats1 and feats2
         torch::Tensor cossim = torch::matmul(feats1, feats2.t());
@@ -134,7 +134,7 @@ namespace XFeat
         auto out2 = detectAndCompute(tensor_img2)[0];
 
         torch::Tensor idxs0, idxs1;
-        std::tie(idxs0, idxs1) = match(out1["descriptors"], out2["descriptors"]);
+        std::tie(idxs0, idxs1) = match(out1["descriptors"], out2["descriptors"], -1.0);
 
         torch::Tensor mkpts_0 = out1["keypoints"].index({idxs0});
         torch::Tensor mkpts_1 = out2["keypoints"].index({idxs1});
@@ -203,7 +203,7 @@ namespace XFeat
     }
 
     torch::Tensor XFDetector::NMS(torch::Tensor& x, float threshold, int kernel_size)
-    {
+    {   
         int B = x.size(0);
         int H = x.size(2);
         int W = x.size(3);
@@ -236,7 +236,7 @@ namespace XFeat
     }
 
     cv::Mat XFDetector::tensorToMat(const torch::Tensor& tensor)
-    {
+    {   
         // ensure tesnor is on CPU and convert to float
         torch::Tensor cpu_tensor = tensor.to(torch::kCPU).to(torch::kFloat);
         cv::Mat mat(cpu_tensor.size(0), 2, CV_32F);
