@@ -17,7 +17,7 @@ In this project, the following packages are used. Make sure the right versions o
 3. gcc and g++ compilers 11.4.0
 4. CMake 3.22.1
 5. OpenCV 4.5.4
-6. [libtorch](https://github.com/pytorch/pytorch)
+6. [libtorch](https://github.com/pytorch/pytorch): Please avoid using the pre-built version of libtorch since it will cause linking issues ([CXX11 ABI issue](https://github.com/pytorch/pytorch/issues/13541))
 
 ## Setup
 
@@ -52,10 +52,16 @@ To perform matching between two images, use this command:
 ./build/examples/example /absolute/path/to/image1 /absolute/path/to/image2
 ```
 
-An example:
+Matching Example:
 
 ```bash
-./build/examples/example $(pwd)/ref.png $(pwd)/tgt.png
+./build/examples/match $(pwd)/ref.png $(pwd)/tgt.png
+```
+
+Realtime Matching Example:
+
+```bash
+./build/examples/realtime_demo
 ```
 
 ## Bibtex Citation
