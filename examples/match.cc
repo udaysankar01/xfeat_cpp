@@ -1,9 +1,6 @@
 #include "XFeat.h"
 
-// forward declarations
-std::string parsePath(std::string relativePath);
 void warp_corners_and_draw_matches(cv::Mat& mkpts_0, cv::Mat& mkpts_1, cv::Mat& img1, cv::Mat& img2);
-
 
 int main(int argc, char** argv) {
 
@@ -96,14 +93,4 @@ void warp_corners_and_draw_matches(cv::Mat& ref_points, cv::Mat& dst_points, cv:
     } else {
         std::cerr << "Keypoints or matches are empty, cannot draw matches" << std::endl;
     }
-}
-
-std::string parsePath(std::string relativePath)
-{
-    std::filesystem::path current_file = __FILE__;
-    std::filesystem::path parent_dir = current_file.parent_path();
-    std::filesystem::path full_path = parent_dir / ".." / relativePath;
-    full_path = std::filesystem::absolute(full_path);
-
-    return static_cast<std::string>(full_path);   
 }

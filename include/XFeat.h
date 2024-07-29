@@ -15,7 +15,7 @@ namespace XFeat
     public:
         XFDetector(int _top_k=4096, float _detection_threshold=0.05, bool use_cuda=true);
         std::vector<std::unordered_map<std::string, torch::Tensor>> detectAndCompute(torch::Tensor& x);
-        std::tuple<torch::Tensor, torch::Tensor> match(torch::Tensor& feats1, torch::Tensor& feats2, float min_cossim=-1.0);
+        std::tuple<torch::Tensor, torch::Tensor> match(torch::Tensor& feats1, torch::Tensor& feats2, float _min_cossim=-1.0);
         std::pair<cv::Mat, cv::Mat> match_xfeat(cv::Mat& img1, cv::Mat& img2);
         torch::Tensor parseInput(cv::Mat& img);
         std::tuple<torch::Tensor, double, double> preprocessTensor(torch::Tensor& x);

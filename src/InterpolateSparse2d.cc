@@ -30,7 +30,8 @@ namespace XFeat
         }   
         else
         {
-            x = torch::nn::functional::grid_sample(x, grid, torch::nn::functional::GridSampleFuncOptions().mode(torch::kBilinear).align_corners(align_corners));
+            std::cerr << "Choose either 'bilinear' or 'nearest'." << std::endl;
+            exit(EXIT_FAILURE);
         }
 
         //reshape output to [B, N, C]

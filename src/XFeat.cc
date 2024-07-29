@@ -94,8 +94,11 @@ namespace XFeat
         return result;
     }   
 
-    std::tuple<torch::Tensor, torch::Tensor> XFDetector::match(torch::Tensor& feats1, torch::Tensor& feats2, float min_cossim)
+    std::tuple<torch::Tensor, torch::Tensor> XFDetector::match(torch::Tensor& feats1, torch::Tensor& feats2, float _min_cossim)
     {   
+        // set the min_cossim
+        min_cossim = _min_cossim;
+
         // compute cossine similarity between feats1 and feats2
         torch::Tensor cossim = torch::matmul(feats1, feats2.t());
         torch::Tensor cossim_t = torch::matmul(feats2, feats1.t());
