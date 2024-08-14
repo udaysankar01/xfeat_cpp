@@ -30,7 +30,7 @@ namespace XFeat
         min_cossim = -1;
     }
 
-    std::vector<std::unordered_map<std::string, torch::Tensor>> XFDetector::detectAndCompute(torch::Tensor& x)
+    void XFDetector::detectAndCompute(torch::Tensor& x, std::unordered_map<std::string, torch::Tensor> &result)
     {   
         torch::Device device(device_type);
         x = x.to(device);
@@ -75,26 +75,18 @@ namespace XFeat
 
         // L2-Normalize
         feats = torch::nn::functional::normalize(feats, torch::nn::functional::NormalizeFuncOptions().dim(-1));
-        auto min_val = feats.min();
-        auto max_val = feats.max();
 
         // correct kpt scale
         torch::Tensor scaling_factors = torch::tensor({rw1, rh1}, mkpts.options()).view({1, 1, -1});
         mkpts = mkpts * scaling_factors;
 
-        std::vector<std::unordered_map<std::string, torch::Tensor>> result;
-        for (int b = 0; b < B; b++) {
-            auto valid = scores[b] > 0;
-            std::unordered_map<std::string, torch::Tensor> item;
-            item["keypoints"] = mkpts[b].index({valid});
-            item["scores"] = scores[b].index({valid});
-            item["descriptors"] = feats[b].index({valid});
-            result.push_back(item);
-        }
-        return result;
+        auto valid = scores[0] > 0;
+        result["keypoints"] = mkpts[0].index({valid});
+        result["scores"] = scores[0].index({valid});
+        result["descriptors"] = feats[0].index({valid});
     }   
 
-    std::tuple<torch::Tensor, torch::Tensor> XFDetector::match(torch::Tensor& feats1, torch::Tensor& feats2, float _min_cossim)
+    void XFDetector::match(torch::Tensor& feats1, torch::Tensor& feats2, torch::Tensor &idx0, torch::Tensor &idx1, float _min_cossim)
     {   
         // set the min_cossim
         min_cossim = _min_cossim;
@@ -108,10 +100,9 @@ namespace XFeat
         std::tie(std::ignore, match21) = cossim_t.max(1);
 
         // index tensor
-        torch::Tensor idx0 = torch::arange(match12.size(0), match12.options());
+        idx0 = torch::arange(match12.size(0), match12.options());
         torch::Tensor mutual = match21.index({match12}) == idx0;
 
-        torch::Tensor idx1;
         if (min_cossim > 0)
         {
             std::tie(cossim, std::ignore) = cossim.max(1);
@@ -124,27 +115,24 @@ namespace XFeat
             idx0 = idx0.index({mutual});
             idx1 = match12.index({mutual}); 
         }
-
-        return std::make_tuple(idx0, idx1);
     }
 
-    std::pair<cv::Mat, cv::Mat> XFDetector::match_xfeat(cv::Mat& img1, cv::Mat& img2)
+    void XFDetector::match_xfeat(cv::Mat& img1, cv::Mat& img2, cv::Mat &mkpts_0, cv::Mat &mkpts_1)
     {   
         torch::Tensor tensor_img1 = parseInput(img1);
         torch::Tensor tensor_img2 = parseInput(img2);
 
-        auto out1 = detectAndCompute(tensor_img1)[0]; // no batches
-        auto out2 = detectAndCompute(tensor_img2)[0];
+        std::unordered_map<std::string, at::Tensor> out1, out2;
+        detectAndCompute(tensor_img1, out1); // no batches
+        detectAndCompute(tensor_img2, out2);
 
         torch::Tensor idxs0, idxs1;
-        std::tie(idxs0, idxs1) = match(out1["descriptors"], out2["descriptors"], -1.0);
+        match(out1["descriptors"], out2["descriptors"], idxs0, idxs1, -1.0);
 
-        torch::Tensor mkpts_0 = out1["keypoints"].index({idxs0});
-        torch::Tensor mkpts_1 = out2["keypoints"].index({idxs1});
-        cv::Mat mkpts_0_cv = tensorToMat(mkpts_0);
-        cv::Mat mkpts_1_cv = tensorToMat(mkpts_1);
-
-        return std::make_pair(mkpts_0_cv, mkpts_1_cv);
+        torch::Tensor mkpts_0_tensor = out1["keypoints"].index({idxs0});
+        torch::Tensor mkpts_1_tensor = out2["keypoints"].index({idxs1});
+        mkpts_0 = tensorToMat(mkpts_0_tensor);
+        mkpts_1 = tensorToMat(mkpts_1_tensor);
     }
 
     torch::Tensor XFDetector::parseInput(cv::Mat &img)

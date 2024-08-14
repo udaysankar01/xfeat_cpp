@@ -97,7 +97,7 @@ public:
         currentFrame = frameGrabber.get_last_frame();
         refFrame = currentFrame.clone();
         auto refFrameTensor =  xfeatDetector->parseInput(refFrame);
-        refKeypointsDescriptors = xfeatDetector->detectAndCompute(refFrameTensor);
+        xfeatDetector->detectAndCompute(refFrameTensor, refKeypointsDescriptors);
 
         while (true) 
         {
@@ -119,7 +119,7 @@ public:
             {
                 refFrame = currentFrame.clone();
                 auto inputTensor = xfeatDetector->parseInput(refFrame);
-                refKeypointsDescriptors = xfeatDetector->detectAndCompute(inputTensor);
+                xfeatDetector->detectAndCompute(inputTensor, refKeypointsDescriptors);
             }
             
             double t1 = cv::getTickCount();
@@ -187,13 +187,15 @@ private:
     cv::Mat matchAndDraw(cv::Mat& refFrame, cv::Mat& currentFrame) 
     {
         torch::Tensor current = xfeatDetector->parseInput(currentFrame);
-        auto currentKeypointsDescriptors = xfeatDetector->detectAndCompute(current);
+        std::unordered_map<std::string, at::Tensor> currentKeypointsDescriptors;
+        xfeatDetector->detectAndCompute(current, currentKeypointsDescriptors);
 
-        auto out1 = refKeypointsDescriptors[0];
-        auto out2 = currentKeypointsDescriptors[0];
+        auto out1 = refKeypointsDescriptors;
+        auto out2 = currentKeypointsDescriptors;
 
         torch::Tensor idxs0, idxs1;
-        std::tie(idxs0, idxs1) = xfeatDetector->match(out1["descriptors"], out2["descriptors"], 0.82);
+        double min_cossim = 0.82;
+        xfeatDetector->match(out1["descriptors"], out2["descriptors"], idxs0, idxs1, min_cossim);
 
         torch::Tensor mkpts_0 = out1["keypoints"].index({idxs0});
         torch::Tensor mkpts_1 = out2["keypoints"].index({idxs1});
@@ -278,7 +280,7 @@ private:
     FrameGrabber frameGrabber;
     cv::Mat refFrame, currentFrame;
     std::shared_ptr<XFDetector> xfeatDetector;
-    std::vector<std::unordered_map<std::string, torch::Tensor>> refKeypointsDescriptors;
+    std::unordered_map<std::string, torch::Tensor> refKeypointsDescriptors;
     std::string windowName = "Real-time matching - Press 's' to set the reference frame.";
     std::vector<cv::Point2f> corners = { {50.f, 50.f}, 
                                          {static_cast<float>(args.width) - 50.f, 50.f}, 

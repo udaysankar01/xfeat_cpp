@@ -1,6 +1,6 @@
 #include "XFeat.h"
 
-void warp_corners_and_draw_matches(cv::Mat& mkpts_0, cv::Mat& mkpts_1, cv::Mat& img1, cv::Mat& img2);
+void warp_corners_and_draw_matches(cv::Mat &mkpts_0, cv::Mat &mkpts_1, cv::Mat &img1, cv::Mat &img2);
 
 int main(int argc, char** argv) {
 
@@ -26,14 +26,14 @@ int main(int argc, char** argv) {
 
     // Perform feature matching on the same image
     cv::Mat mkpts_0, mkpts_1;
-    std::tie(mkpts_0, mkpts_1) = detector.match_xfeat(image1, image2);
+    detector.match_xfeat(image1, image2, mkpts_0, mkpts_1);
 
     warp_corners_and_draw_matches(mkpts_0, mkpts_1, image1, image2);
 
     return 0;
 }
 
-void warp_corners_and_draw_matches(cv::Mat& ref_points, cv::Mat& dst_points, cv::Mat& img1, cv::Mat& img2)
+void warp_corners_and_draw_matches(cv::Mat &ref_points, cv::Mat &dst_points, cv::Mat &img1, cv::Mat &img2)
 {      
     // Check if there are enough points to find a homography
     if (ref_points.rows < 4 || dst_points.rows < 4) {

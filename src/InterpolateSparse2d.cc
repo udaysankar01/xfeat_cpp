@@ -19,7 +19,7 @@ namespace XFeat
         // normalize the positions
         torch::Tensor grid = normgrid(pos, H, W).unsqueeze(-2).to(x.dtype());
 
-        // grid sampling  ---- EDIT!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+        // grid sampling
         if (mode == "bilinear")
         {
             x = torch::nn::functional::grid_sample(x, grid, torch::nn::functional::GridSampleFuncOptions().mode(torch::kBilinear).align_corners(align_corners));
