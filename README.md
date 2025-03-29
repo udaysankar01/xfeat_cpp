@@ -12,11 +12,11 @@ Paper: https://arxiv.org/abs/2404.19174
 
 In this project, the following packages are used. Make sure the right versions of libraries are installed and linked.
 
-1. Tested in Ubuntu 22.04
+1. Tested in Ubuntu 22.04 / 20.04
 2. Nvidia-driver-535 and CUDA Toolkit 12.2
 3. gcc and g++ compilers 11.4.0
-4. CMake 3.22.1
-5. OpenCV 4.5.4
+4. CMake 3.22.1 / 3.5
+5. OpenCV 4.5.4 / 4.1.1
 6. [libtorch](https://github.com/pytorch/pytorch): Please avoid using the pre-built version of libtorch since it will cause linking issues ([CXX11 ABI issue](https://github.com/pytorch/pytorch/issues/13541))
 
 ## Setup
@@ -43,6 +43,18 @@ cd build
 cmake ..
 make -j4
 ```
+To build the project using Docker
+```bash 
+sudo docker build -t xfeat . 
+            or
+./build_docker.sh
+xhost + (in different terminal)
+./run_docker.sh xfeat
+mkdir build 
+cd build
+cmake ..
+make -j4
+```
 
 ## Running
 
@@ -62,6 +74,12 @@ Realtime Matching Example:
 
 ```bash
 ./build/examples/realtime_demo
+```
+
+Realsense Matching Example:
+
+```bash
+./build/realsense_demo
 ```
 
 ## Bibtex Citation

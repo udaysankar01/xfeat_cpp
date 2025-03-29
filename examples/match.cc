@@ -42,7 +42,7 @@ void warp_corners_and_draw_matches(cv::Mat &ref_points, cv::Mat &dst_points, cv:
     }
 
     cv::Mat mask;
-    cv::Mat H = cv::findHomography(ref_points, dst_points, cv::USAC_MAGSAC, 10.0, mask, 1000, 0.994);
+    cv::Mat H = cv::findHomography(ref_points, dst_points, cv::RANSAC, 10.0, mask, 1000, 0.994);
     if (H.empty()) {
         std::cerr << "Homography matrix is empty" << std::endl;
         return;

@@ -209,7 +209,7 @@ private:
         }
 
         cv::Mat mask;
-        cv::Mat H = cv::findHomography(mkpts_0_cv, mkpts_1_cv, cv::USAC_MAGSAC, 10.0, mask, 1000, 0.994);
+        cv::Mat H = cv::findHomography(mkpts_0_cv, mkpts_1_cv, cv::RANSAC, 10.0, mask, 1000, 0.994);
         if (H.empty()) 
         {
             std::cerr << "Homography matrix is empty" << std::endl;

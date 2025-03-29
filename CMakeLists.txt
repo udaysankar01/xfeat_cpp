@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.22.1)
+cmake_minimum_required(VERSION 3.5)
 project(xfeat_cpp)
 
 # Build type:
@@ -13,6 +13,7 @@ set_property(GLOBAL PROPERTY USE_FOLDERS ON)
 set(CMAKE_PREFIX_PATH "${PROJECT_SOURCE_DIR}/thirdparty/pytorch/torch")
 
 # find libraries
+set(CMAKE_PREFIX_PATH "/usr/lib/libtorch")
 find_package(Torch REQUIRED)
 find_package(OpenCV REQUIRED)
 

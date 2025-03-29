@@ -135,7 +135,7 @@ namespace XFeat
         mkpts_1 = tensorToMat(mkpts_1_tensor);
     }
 
-    torch::Tensor XFDetector::parseInput(cv::Mat &img)
+    torch::Tensor XFDetector::parseInput(const cv::Mat &img)
     {   
         // if the image is grayscale
         if (img.channels() == 1)
@@ -230,7 +230,7 @@ namespace XFeat
     {   
         // ensure tesnor is on CPU and convert to float
         torch::Tensor cpu_tensor = tensor.to(torch::kCPU).to(torch::kFloat);
-        cv::Mat mat(cpu_tensor.size(0), 2, CV_32F);
+        cv::Mat mat(cpu_tensor.size(0), cpu_tensor.size(1), CV_32F);
         std::memcpy(mat.data, cpu_tensor.data_ptr<float>(), cpu_tensor.numel() * sizeof(float));
         return mat;
     }
@@ -244,5 +244,84 @@ namespace XFeat
 
         return static_cast<std::string>(full_path);   
     }
+
+    cv::Mat XFDetector::tensorTo1DMat(const torch::Tensor& tensor)
+    {   
+        // ensure tesnor is on CPU and convert to float
+        torch::Tensor cpu_tensor = tensor.to(torch::kCPU).to(torch::kFloat);
+        // cv::Mat mat(cpu_tensor.size(0),1, CV_32F);
+        cv::Mat mat(cpu_tensor.size(0),1, CV_32F);
+        std::memcpy(mat.data, cpu_tensor.data_ptr<float>(), cpu_tensor.numel() * sizeof(float));
+        return mat;
+    }
+
+    std::unordered_map<std::string, at::Tensor> XFDetector::convertToTorch(const cv::Mat &descriptors, const std::vector<cv::KeyPoint> &keypoints)
+    {
+        std::unordered_map<std::string, at::Tensor> output;
+        output["keypoints"] = cvToTorch(descriptors);
+        output["descriptors"] = cvToTorch(keypoints);
+    
+        return output;
+    }
+
+    torch::Tensor XFDetector::cvToTorch(const cv::Mat& descriptors)
+    {
+        torch::Tensor desc_tensor = torch::from_blob(descriptors.data, {descriptors.rows, descriptors.cols}, torch::kFloat);
+        desc_tensor = desc_tensor.clone(); 
+
+        return desc_tensor;
+
+    }
+
+    torch::Tensor XFDetector::cvToTorch(const std::vector<cv::KeyPoint>& keypoints)
+    {
+        std::vector<float> kpts_vec;
+        for (const auto &kp : keypoints)
+        {
+            kpts_vec.push_back(kp.pt.x);
+            kpts_vec.push_back(kp.pt.y);
+        }
+        torch::Tensor kpts_tensor = torch::from_blob(kpts_vec.data(), {static_cast<long>(keypoints.size()), 2}, torch::kFloat).clone();
+
+        return kpts_tensor;
+    }
+
+    void XFDetector::extractFeatures(const cv::Mat& img,std::vector<cv::KeyPoint>& keypoints,cv::Mat& descs)
+    {
+        torch::Tensor tensor_img = this->parseInput(img);
+        std::unordered_map<std::string,at::Tensor> out;
+        this->detectAndCompute(tensor_img,out);
+        cv::Mat kps = this->tensorToMat(out["keypoints"]);
+        descs = this->tensorToMat(out["descriptors"]);
+    
+        keypoints.clear();
+    
+        for(int i = 0; i <  kps.rows; i++)
+        {
+            cv::KeyPoint kp(kps.at<float>(i,0),kps.at<float>(i,1),0);
+            keypoints.push_back(kp);
+        }
+    }
+
+    void XFDetector::matchFeatures(const cv::Mat& desc1,const cv::Mat& desc2, std::vector<cv::DMatch>& good_matches)
+    {
+        torch::Tensor out_tensor_1 = this->cvToTorch(desc1);
+        torch::Tensor out_tensor_2 = this->cvToTorch(desc2);
+    
+        torch::Tensor idx0,idx1;
+        this->match(out_tensor_1,out_tensor_2,idx0,idx1,0.82);
+    
+        cv::Mat index0 = this->tensorTo1DMat(idx0);
+        cv::Mat index1 = this->tensorTo1DMat(idx1);
+    
+        good_matches.clear();
+    
+        for(int i = 0; i < index0.rows; i++)
+        {
+            cv::DMatch match(index0.at<float>(i),index1.at<float>(i),0);
+            good_matches.push_back(match);
+        }
+    }
+
 
 } // namespace XFeat 
